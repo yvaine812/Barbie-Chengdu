@@ -10,7 +10,7 @@
             --main-purple: #9d8ec7;
             --dark-purple: #5c4e8c;
             --light-purple: #f8f4ff;
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.9);
             --card-shadow: 0 8px 24px rgba(157, 142, 199, 0.18);
         }
@@ -31,7 +31,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
+            overflow: hidden;
             padding: 10px;
         }
 
@@ -40,7 +40,7 @@
             max-width: 430px;
             height: 92vh;
             max-height: 880px;
-            background: rgba(248, 244, 255, 0.75);
+            background: rgba(248, 244, 255, 0.8);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 36px;
@@ -55,7 +55,7 @@
         .header-bar {
             padding: 12px 20px 8px;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
@@ -96,39 +96,43 @@
             height: 100%;
         }
 
-        /* 天气与熊猫 */
+        /* 1. 天气与熊猫卡片 */
         .weather-panda-card {
             height: 48%;
-            position: relative;
-            background: linear-gradient(180deg, #e8eaf6 0%, #f3e5f5 100%);
+            background: linear-gradient(180deg, #e1f5fe 0%, #e8f5e9 60%, #f3e5f5 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 10px;
         }
 
         .weather-info {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            z-index: 5;
+            width: 90%;
+            margin-top: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.85);
             padding: 6px 10px;
             border-radius: 12px;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .weather-city { font-size: 11px; font-weight: 700; color: var(--dark-purple); }
         .weather-temp { font-size: 16px; font-weight: 800; color: #6a4fa3; }
 
-        #pandaCanvas {
+        .panda-wrapper {
+            position: relative;
             width: 100%;
-            height: 100%;
-            display: block;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
         }
 
-        /* 左下穿搭分类 */
+        /* 2. 穿搭选择框 */
         .outfit-selector-card {
             height: 52%;
             padding: 8px;
@@ -182,7 +186,7 @@
             aspect-ratio: 1;
             border: 2px dashed rgba(157, 142, 199, 0.4);
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.65);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -195,17 +199,17 @@
 
         .item-frame.selected {
             border: 2px solid #8e62d4;
-            background: rgba(240, 230, 255, 0.85);
+            background: rgba(240, 230, 255, 0.9);
             box-shadow: 0 0 8px rgba(142, 98, 212, 0.3);
         }
 
         .item-preview {
             width: 100%;
-            height: 70%;
+            height: 65%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 26px;
         }
 
         .item-preview img {
@@ -222,20 +226,30 @@
             font-weight: 600;
         }
 
-        /* 右上芭比 3D 场景 */
+        /* 3. 右侧芭比舞台 */
         .barbie-avatar-card {
             height: 72%;
             position: relative;
-            background: radial-gradient(circle at 50% 40%, rgba(255, 245, 255, 1) 0%, rgba(230, 215, 250, 0.7) 100%);
+            background: radial-gradient(circle at 50% 30%, rgba(255, 245, 255, 1) 0%, rgba(230, 215, 250, 0.8) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .barbie-character {
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            animation: floatAnim 3s infinite ease-in-out;
+            transition: transform 0.5s ease;
         }
 
-        #barbieCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
         }
 
         .style-tag {
@@ -249,9 +263,10 @@
             font-size: 9px;
             color: var(--dark-purple);
             font-weight: 600;
+            white-space: nowrap;
         }
 
-        /* 右下任务列表 */
+        /* 4. 右下任务清单 */
         .task-list-card {
             height: 28%;
             padding: 8px 10px;
@@ -270,7 +285,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.6);
             padding: 4px 6px;
             border-radius: 8px;
         }
@@ -307,12 +322,17 @@
             cursor: pointer;
         }
 
+        .apply-btn:active {
+            transform: scale(0.97);
+        }
+
         .file-input { display: none; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
+        <!-- 顶部 Title -->
         <div class="header-bar">
             <span style="font-size: 12px;">🌸 成都</span>
             <span class="header-title">CHENGDU OUTFIT</span>
@@ -320,23 +340,47 @@
         </div>
 
         <div class="main-content">
-            <!-- 左侧面板 -->
+            <!-- 左侧区域 -->
             <div class="left-panel">
-                <!-- 天气与大熊猫动态背景 -->
+                <!-- 左上：天气与成都大熊猫 -->
                 <div class="glass-card weather-panda-card">
                     <div class="weather-info">
                         <div>
                             <div class="weather-city">成都 · 熊猫基地</div>
-                            <div style="font-size: 9px; color: #7d6b9d;">清爽秋季 · 适宜出行</div>
+                            <div style="font-size: 9px; color: #7d6b9d;">22°C 清爽适宜</div>
                         </div>
-                        <div class="weather-temp">22°C</div>
+                        <div class="weather-temp">⛅</div>
                     </div>
-                    <canvas id="pandaCanvas"></canvas>
+
+                    <!-- 矢量大熊猫与竹林 (保底 100% 显示) -->
+                    <div class="panda-wrapper">
+                        <svg width="140" height="90" viewBox="0 0 140 90">
+                            <!-- 竹林 -->
+                            <rect x="15" y="0" width="6" height="90" rx="3" fill="#a8e6cf" />
+                            <rect x="120" y="0" width="6" height="90" rx="3" fill="#a8e6cf" />
+                            <!-- 熊猫耳朵 -->
+                            <circle cx="50" cy="32" r="10" fill="#333" />
+                            <circle cx="90" cy="32" r="10" fill="#333" />
+                            <!-- 熊猫头部 -->
+                            <circle cx="70" cy="48" r="28" fill="#fff" stroke="#e0e0e0" stroke-width="2" />
+                            <!-- 黑眼圈与黑眼睛 -->
+                            <ellipse cx="58" cy="46" rx="7" ry="5" fill="#333" transform="rotate(-15 58 46)" />
+                            <ellipse cx="82" cy="46" rx="7" ry="5" fill="#333" transform="rotate(15 82 46)" />
+                            <circle cx="60" cy="46" r="2" fill="#fff" />
+                            <circle cx="80" cy="46" r="2" fill="#fff" />
+                            <!-- 鼻子与腮红 -->
+                            <ellipse cx="70" cy="54" rx="4" ry="3" fill="#333" />
+                            <circle cx="50" cy="56" r="4" fill="#ffb7b2" opacity="0.7" />
+                            <circle cx="90" cy="56" r="4" fill="#ffb7b2" opacity="0.7" />
+                            <!-- 身体 -->
+                            <ellipse cx="70" cy="85" rx="30" ry="15" fill="#fff" stroke="#e0e0e0" stroke-width="2" />
+                        </svg>
+                    </div>
                 </div>
 
-                <!-- 穿搭分类选择框 -->
+                <!-- 左下：穿搭分类选择框架 -->
                 <div class="glass-card outfit-selector-card">
-                    <div class="section-title">👔 穿搭选择框</div>
+                    <div class="section-title">👔 穿搭选择框架</div>
                     <div class="category-tabs">
                         <button class="tab-btn active" onclick="switchCategory('clothes')">衣服</button>
                         <button class="tab-btn" onclick="switchCategory('acc')">配饰</button>
@@ -347,15 +391,50 @@
                 </div>
             </div>
 
-            <!-- 右侧面板 -->
+            <!-- 右侧区域 -->
             <div class="right-panel">
-                <!-- 真人卡通 3D 芭比形象 -->
+                <!-- 右上：真人卡通化芭比形象 (保底 100% 显示) -->
                 <div class="glass-card barbie-avatar-card">
-                    <canvas id="barbieCanvas"></canvas>
-                    <div class="style-tag">✨ 清冷可爱 · 芭比公主</div>
+                    <div class="barbie-character" id="barbieDoll">
+                        <svg width="150" height="230" viewBox="0 0 150 230">
+                            <!-- 芭比波浪长发 (金色) -->
+                            <path d="M 45 60 C 20 90, 20 160, 40 190 Q 75 210 110 190 C 130 160, 130 90, 105 60 Z" fill="#ffe082" />
+                            <!-- 面部轮廓 -->
+                            <ellipse cx="75" cy="65" rx="26" ry="30" fill="#ffedd8" />
+                            <!-- 芭比精致大眼睛 -->
+                            <ellipse cx="63" cy="62" rx="5" ry="7" fill="#3a86ff" />
+                            <ellipse cx="87" cy="62" rx="5" ry="7" fill="#3a86ff" />
+                            <circle cx="61" cy="60" r="2" fill="#fff" />
+                            <circle cx="85" cy="60" r="2" fill="#fff" />
+                            <!-- 长睫毛 -->
+                            <path d="M 56 55 Q 63 50 70 55" stroke="#333" stroke-width="2" fill="none" />
+                            <path d="M 80 55 Q 87 50 94 55" stroke="#333" stroke-width="2" fill="none" />
+                            <!-- 腮红与唇彩 -->
+                            <circle cx="56" cy="72" r="5" fill="#ff8a80" opacity="0.5" />
+                            <circle cx="94" cy="72" r="5" fill="#ff8a80" opacity="0.5" />
+                            <path d="M 70 82 Q 75 87 80 82" stroke="#ff4081" stroke-width="3" fill="none" stroke-linecap="round" />
+                            
+                            <!-- 脖子 -->
+                            <rect x="71" y="90" width="8" height="12" fill="#ffedd8" />
+                            
+                            <!-- 可换色的连衣裙/服装 -->
+                            <path id="barbieDress" d="M 58 100 L 92 100 L 115 190 L 35 190 Z" fill="#ab8beb" />
+                            <!-- 连衣裙精致花边 -->
+                            <path d="M 58 100 Q 75 110 92 100" stroke="#fff" stroke-width="2" fill="none" />
+                            
+                            <!-- 胳膊 -->
+                            <path d="M 58 102 C 45 120, 45 140, 42 155" stroke="#ffedd8" stroke-width="7" stroke-linecap="round" fill="none" />
+                            <path d="M 92 102 C 105 120, 105 140, 108 155" stroke="#ffedd8" stroke-width="7" stroke-linecap="round" fill="none" />
+                            
+                            <!-- 可换色的手提包 -->
+                            <rect id="barbieBag" x="102" y="145" width="22" height="18" rx="4" fill="#9575cd" />
+                            <path d="M 107 145 Q 113 135 119 145" stroke="#fff" stroke-width="2" fill="none" />
+                        </svg>
+                    </div>
+                    <div class="style-tag">✨ 真人卡通 · 芭比公主</div>
                 </div>
 
-                <!-- 3行可勾选任务清单 -->
+                <!-- 右下：3行可勾选任务清单 -->
                 <div class="glass-card task-list-card">
                     <div class="section-title">📝 今日打卡清单</div>
                     <div class="task-items">
@@ -369,49 +448,50 @@
                         </div>
                         <div class="task-item">
                             <input type="checkbox" class="task-checkbox">
-                            <input type="text" class="task-text" value="拍一张芭比公主风格卡">
+                            <input type="text" class="task-text" value="拍一张芭比公主风格照">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- 底部提交按钮 -->
         <div class="action-bar">
             <button class="apply-btn" onclick="applyOutfit()">✨ 生成到右边芭比形象</button>
         </div>
     </div>
 
+    <!-- 隐藏上传控件 -->
     <input type="file" id="imageUploader" class="file-input" accept="image/*" onchange="handleImageUpload(event)">
 
     <script>
-        // 内置默认穿搭与矢量/图片数据
+        // 预设数据与矢量图标
         const categoriesData = {
             clothes: [
                 { id: 'c1', name: '淡紫风衣', icon: '🧥', color: '#ab8beb', selected: true },
-                { id: 'c2', name: '清冷毛衣', icon: '👔', color: '#d1c4e9', selected: false },
-                { id: 'c3', name: '添加图片', isUploadSlot: true }
+                { id: 'c2', name: '清冷粉裙', icon: '👗', color: '#f48fb1', selected: false },
+                { id: 'c3', name: '加入图片', isUploadSlot: true }
             ],
             acc: [
                 { id: 'a1', name: '珍珠发带', icon: '👑', color: '#ffffff', selected: true },
                 { id: 'a2', name: '复古墨镜', icon: '🕶️', color: '#90a4ae', selected: false },
-                { id: 'a3', name: '添加图片', isUploadSlot: true }
+                { id: 'a3', name: '加入图片', isUploadSlot: true }
             ],
             shoes: [
-                { id: 's1', name: '芭比马丁靴', icon: '👢', color: '#f48fb1', selected: true },
-                { id: 's2', name: '银色长靴', icon: '👠', color: '#cfd8dc', selected: false },
-                { id: 's3', name: '添加图片', isUploadSlot: true }
+                { id: 's1', name: '芭比短靴', icon: '👢', color: '#f48fb1', selected: true },
+                { id: 's2', name: '高跟凉鞋', icon: '👠', color: '#cfd8dc', selected: false },
+                { id: 's3', name: '加入图片', isUploadSlot: true }
             ],
             bags: [
                 { id: 'b1', name: '淡紫链条包', icon: '👜', color: '#9575cd', selected: true },
-                { id: 'b2', name: '可爱竹编包', icon: '🛍️', color: '#d7ccc8', selected: false },
-                { id: 'b3', name: '添加图片', isUploadSlot: true }
+                { id: 'b2', name: '可爱草编包', icon: '🛍️', color: '#d7ccc8', selected: false },
+                { id: 'b3', name: '加入图片', isUploadSlot: true }
             ]
         };
 
         let currentCategory = 'clothes';
-        let barbieState = { dressColor: '#ab8beb', bagColor: '#9575cd', angle: 0 };
 
-        // 渲染左下穿搭框架
+        // 渲染分类列表
         function renderCategoryFrames() {
             const container = document.getElementById('gridContainer');
             container.innerHTML = '';
@@ -421,7 +501,7 @@
                 frame.className = `item-frame ${item.selected ? 'selected' : ''}`;
 
                 if (item.isUploadSlot) {
-                    frame.innerHTML = `<div class="item-preview" style="font-size:20px;color:#9d8ec7;">➕</div><div class="frame-label">加入图片</div>`;
+                    frame.innerHTML = `<div class="item-preview" style="font-size:22px;color:#9d8ec7;">➕</div><div class="frame-label">加入图片</div>`;
                     frame.onclick = () => document.getElementById('imageUploader').click();
                 } else if (item.img) {
                     frame.innerHTML = `<div class="item-preview"><img src="${item.img}" /></div><div class="frame-label">${item.name}</div>`;
@@ -447,6 +527,7 @@
             renderCategoryFrames();
         }
 
+        // 上传本地图片处理
         function handleImageUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -454,144 +535,39 @@
             reader.onload = function(evt) {
                 const list = categoriesData[currentCategory];
                 const newId = 'upload_' + Date.now();
-                list.unshift({ id: newId, name: '自定义', img: evt.target.result, color: '#ab8beb', selected: true });
+                list.unshift({ id: newId, name: '自定义服装', img: evt.target.result, color: '#ab8beb', selected: true });
                 list.forEach(i => { if (i.id !== newId) i.selected = false; });
                 renderCategoryFrames();
             };
             reader.readAsDataURL(file);
         }
 
-        // 1. 绘制左上：熊猫基地与动态大熊猫
-        function initPandaCanvas() {
-            const cvs = document.getElementById('pandaCanvas');
-            const ctx = cvs.getContext('2d');
-            
-            function resize() {
-                cvs.width = cvs.parentElement.clientWidth || 180;
-                cvs.height = cvs.parentElement.clientHeight || 180;
-            }
-            resize();
-
-            let time = 0;
-            function draw() {
-                time += 0.04;
-                const w = cvs.width, h = cvs.height;
-                ctx.clearRect(0, 0, w, h);
-
-                // 竹林背景
-                ctx.fillStyle = '#eaf4eb';
-                ctx.fillRect(0, 0, w, h);
-
-                // 竹子
-                ctx.fillStyle = '#a8e6cf';
-                for(let i=0; i<4; i++){
-                    let bx = w * 0.25 * i + 15;
-                    ctx.fillRect(bx, 0, 6, h);
-                }
-
-                // 熊猫位置
-                let px = w * 0.5, py = h * 0.65;
-                let bounce = Math.sin(time * 2) * 2;
-
-                // 身体
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(px, py + 10, 26, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = '#333'; ctx.stroke();
-
-                // 耳朵与手臂
-                ctx.fillStyle = '#333333';
-                ctx.beginPath(); ctx.arc(px - 18, py - 22 + bounce, 7, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(px + 18, py - 22 + bounce, 7, 0, Math.PI*2); ctx.fill();
-
-                // 头部
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(px, py - 8 + bounce, 20, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-
-                // 眼睛与腮红
-                ctx.fillStyle = '#333';
-                ctx.beginPath(); ctx.arc(px - 7, py - 9 + bounce, 3, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(px + 7, py - 9 + bounce, 3, 0, Math.PI*2); ctx.fill();
-
-                ctx.fillStyle = '#ffb7b2';
-                ctx.beginPath(); ctx.arc(px - 12, py - 4 + bounce, 3.5, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(px + 12, py - 4 + bounce, 3.5, 0, Math.PI*2); ctx.fill();
-
-                requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
-        // 2. 绘制右侧：真人卡通芭比形象 Canvas
-        function initBarbieCanvas() {
-            const cvs = document.getElementById('barbieCanvas');
-            const ctx = cvs.getContext('2d');
-
-            function resize() {
-                cvs.width = cvs.parentElement.clientWidth || 200;
-                cvs.height = cvs.parentElement.clientHeight || 280;
-            }
-            resize();
-
-            let t = 0;
-            function draw() {
-                t += 0.03;
-                const w = cvs.width, h = cvs.height;
-                ctx.clearRect(0, 0, w, h);
-
-                let cx = w * 0.5;
-                let cy = h * 0.5 + Math.sin(t) * 3; // 呼吸起伏
-
-                // 芭比长发 (金色)
-                ctx.fillStyle = '#ffe082';
-                ctx.beginPath(); ctx.arc(cx, cy - 40, 38, 0, Math.PI*2); ctx.fill();
-
-                // 身体与裙子
-                ctx.fillStyle = barbieState.dressColor;
-                ctx.beginPath();
-                ctx.moveTo(cx - 15, cy - 10);
-                ctx.lineTo(cx + 15, cy - 10);
-                ctx.lineTo(cx + 35, cy + 50);
-                ctx.lineTo(cx - 35, cy + 50);
-                ctx.closePath();
-                ctx.fill();
-
-                // 面部 (真人卡通轮廓)
-                ctx.fillStyle = '#ffedd8';
-                ctx.beginPath(); ctx.arc(cx, cy - 40, 24, 0, Math.PI*2); ctx.fill();
-
-                // 芭比大眼睛
-                ctx.fillStyle = '#3a86ff';
-                ctx.beginPath(); ctx.arc(cx - 8, cy - 42, 4, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(cx + 8, cy - 42, 4, 0, Math.PI*2); ctx.fill();
-
-                // 睫毛与唇彩
-                ctx.fillStyle = '#ff70a6';
-                ctx.beginPath(); ctx.arc(cx, cy - 32, 3, 0, Math.PI); ctx.fill();
-
-                // 手提包
-                ctx.fillStyle = barbieState.bagColor;
-                ctx.fillRect(cx + 22, cy + 10, 16, 14);
-
-                requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
-        // 生成更换穿搭
+        // 核心换装逻辑：将选中的服装与色彩更新到右侧芭比身上
         function applyOutfit() {
             const selectedClothes = categoriesData.clothes.find(i => i.selected);
             const selectedBag = categoriesData.bags.find(i => i.selected);
 
-            if (selectedClothes) barbieState.dressColor = selectedClothes.color || '#ab8beb';
-            if (selectedBag) barbieState.bagColor = selectedBag.color || '#9575cd';
+            const dressEl = document.getElementById('barbieDress');
+            const bagEl = document.getElementById('barbieBag');
+            const barbieDoll = document.getElementById('barbieDoll');
+
+            if (selectedClothes && dressEl) {
+                dressEl.setAttribute('fill', selectedClothes.color || '#ab8beb');
+            }
+            if (selectedBag && bagEl) {
+                bagEl.setAttribute('fill', selectedBag.color || '#9575cd');
+            }
+
+            // 触发优雅旋转换装动画
+            barbieDoll.style.transform = 'rotateY(360deg)';
+            setTimeout(() => {
+                barbieDoll.style.transform = 'rotateY(0deg)';
+            }, 600);
         }
 
+        // 初始化
         window.onload = () => {
             renderCategoryFrames();
-            setTimeout(() => {
-                initPandaCanvas();
-                initBarbieCanvas();
-            }, 100);
         };
     </script>
 </body>
