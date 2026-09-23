@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>成都天气与芭比换装小程序</title>
-    <!-- Three.js 3D 渲染引擎库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --bg-lavender: #f0e6ff;
             --main-purple: #9d8ec7;
             --dark-purple: #5c4e8c;
             --light-purple: #f8f4ff;
-            --accent-pink: #f4c2c2;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
             --card-shadow: 0 8px 24px rgba(157, 142, 199, 0.18);
         }
 
@@ -38,13 +35,12 @@
             padding: 10px;
         }
 
-        /* 手机适配容器 */
         .app-container {
             width: 100%;
             max-width: 430px;
             height: 92vh;
             max-height: 880px;
-            background: rgba(248, 244, 255, 0.7);
+            background: rgba(248, 244, 255, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 36px;
@@ -56,14 +52,11 @@
             position: relative;
         }
 
-        /* 顶部标题栏 */
         .header-bar {
             padding: 12px 20px 8px;
             text-align: center;
             font-size: 16px;
             font-weight: 600;
-            color: var(--dark-purple);
-            letter-spacing: 1px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -76,17 +69,15 @@
             font-weight: 700;
         }
 
-        /* 主工作区：左侧与右侧并排布局 */
         .main-content {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 1.05fr;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             padding: 8px 12px 12px;
             min-height: 0;
         }
 
-        /* 模块卡片通用玻璃风格 */
         .glass-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -98,53 +89,38 @@
             position: relative;
         }
 
-        /* 左侧区域容器 */
-        .left-panel {
+        .left-panel, .right-panel {
             display: flex;
             flex-direction: column;
             gap: 10px;
             height: 100%;
         }
 
-        /* 左上：天气与熊猫基地画布 */
+        /* 天气与熊猫 */
         .weather-panda-card {
             height: 48%;
             position: relative;
-            background: linear-gradient(180deg, rgba(235, 222, 250, 0.8) 0%, rgba(255,255,255,0.7) 100%);
+            background: linear-gradient(180deg, #e8eaf6 0%, #f3e5f5 100%);
         }
 
         .weather-info {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            z-index: 2;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            z-index: 5;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            background: rgba(255, 255, 255, 0.5);
+            align-items: center;
+            background: rgba(255, 255, 255, 0.65);
             padding: 6px 10px;
             border-radius: 12px;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.8);
         }
 
-        .weather-city {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--dark-purple);
-        }
-
-        .weather-temp {
-            font-size: 18px;
-            font-weight: 800;
-            color: #6a4fa3;
-        }
-
-        .weather-desc {
-            font-size: 10px;
-            color: #7d6b9d;
-        }
+        .weather-city { font-size: 11px; font-weight: 700; color: var(--dark-purple); }
+        .weather-temp { font-size: 16px; font-weight: 800; color: #6a4fa3; }
 
         #pandaCanvas {
             width: 100%;
@@ -152,7 +128,7 @@
             display: block;
         }
 
-        /* 左下：可选择的穿搭框架 */
+        /* 左下穿搭分类 */
         .outfit-selector-card {
             height: 52%;
             padding: 8px;
@@ -165,19 +141,15 @@
             font-weight: 700;
             color: var(--dark-purple);
             margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
 
-        /* 分类 Tab */
         .category-tabs {
             display: flex;
             gap: 2px;
             background: rgba(220, 205, 240, 0.4);
             padding: 3px;
             border-radius: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .tab-btn {
@@ -190,7 +162,6 @@
             color: #6b5c8d;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .tab-btn.active {
@@ -199,22 +170,19 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
-        /* 框架格子列表 */
         .grid-container {
             flex: 1;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 6px;
             overflow-y: auto;
-            padding-right: 2px;
         }
 
-        /* 可选择/加入图片的框架卡片 */
         .item-frame {
             aspect-ratio: 1;
             border: 2px dashed rgba(157, 142, 199, 0.4);
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.6);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -222,74 +190,68 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            transition: all 0.2s ease;
+            padding: 4px;
         }
 
         .item-frame.selected {
             border: 2px solid #8e62d4;
-            background: rgba(240, 230, 255, 0.8);
-            box-shadow: 0 0 8px rgba(142, 98, 212, 0.4);
+            background: rgba(240, 230, 255, 0.85);
+            box-shadow: 0 0 8px rgba(142, 98, 212, 0.3);
         }
 
-        .item-frame img {
-            width: 85%;
-            height: 85%;
+        .item-preview {
+            width: 100%;
+            height: 70%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .item-preview img {
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-        }
-
-        .upload-icon {
-            font-size: 18px;
-            color: var(--main-purple);
-            margin-bottom: 2px;
         }
 
         .frame-label {
             font-size: 9px;
-            color: #8372a6;
+            color: #7d6b9d;
             text-align: center;
+            margin-top: 2px;
+            font-weight: 600;
         }
 
-        .file-input {
-            display: none;
-        }
-
-        /* 右侧区域容器 */
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            height: 100%;
-        }
-
-        /* 右上：3D真人卡通芭比形象 */
+        /* 右上芭比 3D 场景 */
         .barbie-avatar-card {
             height: 72%;
             position: relative;
-            background: radial-gradient(circle at 50% 40%, rgba(255, 245, 255, 0.9) 0%, rgba(230, 215, 250, 0.6) 100%);
+            background: radial-gradient(circle at 50% 40%, rgba(255, 245, 255, 1) 0%, rgba(230, 215, 250, 0.7) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        #barbie3dContainer {
+        #barbieCanvas {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
         .style-tag {
             position: absolute;
-            bottom: 8px;
+            bottom: 6px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             padding: 3px 10px;
             border-radius: 12px;
             font-size: 9px;
             color: var(--dark-purple);
             font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            pointer-events: none;
-            white-space: nowrap;
         }
 
-        /* 右下：3行可勾选任务清单 */
+        /* 右下任务列表 */
         .task-list-card {
             height: 28%;
             padding: 8px 10px;
@@ -301,8 +263,7 @@
         .task-items {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-top: 4px;
+            gap: 5px;
         }
 
         .task-item {
@@ -312,58 +273,25 @@
             background: rgba(255, 255, 255, 0.5);
             padding: 4px 6px;
             border-radius: 8px;
-            font-size: 10px;
         }
 
         .task-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
             width: 14px;
             height: 14px;
-            border: 1.5px solid var(--main-purple);
-            border-radius: 4px;
-            outline: none;
-            cursor: pointer;
-            position: relative;
-            background: #fff;
-        }
-
-        .task-checkbox:checked {
-            background-color: #8e62d4;
-            border-color: #8e62d4;
-        }
-
-        .task-checkbox:checked::after {
-            content: '✓';
-            position: absolute;
-            color: white;
-            font-size: 10px;
-            top: -2px;
-            left: 2px;
-            font-weight: bold;
+            accent-color: #8e62d4;
         }
 
         .task-text {
             color: #554477;
             flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             border: none;
             background: transparent;
             outline: none;
             font-size: 10px;
         }
 
-        .task-checkbox:checked + .task-text {
-            text-decoration: line-through;
-            color: #a497c0;
-        }
-
-        /* 底部生成应用按钮 */
         .action-bar {
             padding: 8px 12px 12px;
-            text-align: center;
         }
 
         .apply-btn {
@@ -375,185 +303,133 @@
             color: white;
             font-size: 13px;
             font-weight: 700;
-            letter-spacing: 0.5px;
             box-shadow: 0 4px 15px rgba(136, 101, 212, 0.35);
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
         }
 
-        .apply-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* 自定义滚动条 */
-        ::-webkit-scrollbar {
-            width: 3px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(157, 142, 199, 0.4);
-            border-radius: 4px;
-        }
+        .file-input { display: none; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- 顶部 Header -->
         <div class="header-bar">
             <span style="font-size: 12px;">🌸 成都</span>
             <span class="header-title">CHENGDU OUTFIT</span>
             <span style="font-size: 12px;">✨ 芭比换装</span>
         </div>
 
-        <!-- 主布局 (左边 / 右边) -->
         <div class="main-content">
-            
-            <!-- 左边面板 -->
+            <!-- 左侧面板 -->
             <div class="left-panel">
-                
-                <!-- 左边上面：成都实时天气 + 动态熊猫基地 -->
+                <!-- 天气与大熊猫动态背景 -->
                 <div class="glass-card weather-panda-card">
                     <div class="weather-info">
                         <div>
                             <div class="weather-city">成都 · 熊猫基地</div>
-                            <div class="weather-desc">适合清爽秋季穿搭</div>
+                            <div style="font-size: 9px; color: #7d6b9d;">清爽秋季 · 适宜出行</div>
                         </div>
                         <div class="weather-temp">22°C</div>
                     </div>
                     <canvas id="pandaCanvas"></canvas>
                 </div>
 
-                <!-- 左边下面：穿搭选择框架 (衣服, 配饰, 鞋, 包) -->
+                <!-- 穿搭分类选择框 -->
                 <div class="glass-card outfit-selector-card">
-                    <div class="section-title">
-                        <span>👔</span> 穿搭分类选择框
-                    </div>
-
-                    <!-- 4个分类页签 -->
+                    <div class="section-title">👔 穿搭选择框</div>
                     <div class="category-tabs">
                         <button class="tab-btn active" onclick="switchCategory('clothes')">衣服</button>
                         <button class="tab-btn" onclick="switchCategory('acc')">配饰</button>
                         <button class="tab-btn" onclick="switchCategory('shoes')">鞋子</button>
                         <button class="tab-btn" onclick="switchCategory('bags')">包包</button>
                     </div>
-
-                    <!-- 图片框架显示区 -->
-                    <div class="grid-container" id="gridContainer">
-                        <!-- 动态生成框架内容 -->
-                    </div>
+                    <div class="grid-container" id="gridContainer"></div>
                 </div>
-
             </div>
 
-            <!-- 右边面板 -->
+            <!-- 右侧面板 -->
             <div class="right-panel">
-                
-                <!-- 右边上面：真人卡通化芭比 3D 人物形象 -->
+                <!-- 真人卡通 3D 芭比形象 -->
                 <div class="glass-card barbie-avatar-card">
-                    <div id="barbie3dContainer"></div>
-                    <div class="style-tag">✨ 清冷可爱 · 3D 芭比形象</div>
+                    <canvas id="barbieCanvas"></canvas>
+                    <div class="style-tag">✨ 清冷可爱 · 芭比公主</div>
                 </div>
 
-                <!-- 右边下面：3行可勾选任务清单 -->
+                <!-- 3行可勾选任务清单 -->
                 <div class="glass-card task-list-card">
-                    <div class="section-title">
-                        <span>📝</span> 今日打卡清单
-                    </div>
+                    <div class="section-title">📝 今日打卡清单</div>
                     <div class="task-items">
                         <div class="task-item">
-                            <input type="checkbox" class="task-checkbox" id="task1" checked>
-                            <input type="text" class="task-text" value="选一套清冷风紫色搭配">
+                            <input type="checkbox" class="task-checkbox" checked>
+                            <input type="text" class="task-text" value="选一套清冷淡紫色搭配">
                         </div>
                         <div class="task-item">
-                            <input type="checkbox" class="task-checkbox" id="task2">
-                            <input type="text" class="task-text" value="前往成都熊猫基地打卡">
+                            <input type="checkbox" class="task-checkbox">
+                            <input type="text" class="task-text" value="成都熊猫基地打卡合影">
                         </div>
                         <div class="task-item">
-                            <input type="checkbox" class="task-checkbox" id="task3">
-                            <input type="text" class="task-text" value="拍一张芭比风格卡通照">
+                            <input type="checkbox" class="task-checkbox">
+                            <input type="text" class="task-text" value="拍一张芭比公主风格卡">
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- 底部应用按钮 -->
         <div class="action-bar">
-            <button class="apply-btn" onclick="applyOutfitToBarbie()">
-                <span>✨</span> 生成到右边芭比形象
-            </button>
+            <button class="apply-btn" onclick="applyOutfit()">✨ 生成到右边芭比形象</button>
         </div>
     </div>
 
-    <!-- 隐藏的通用文件上传控件 -->
     <input type="file" id="imageUploader" class="file-input" accept="image/*" onchange="handleImageUpload(event)">
 
     <script>
-        /* ----------------------------------------------------
-         * 1. 分类穿搭框架数据管理
-         * ---------------------------------------------------- */
+        // 内置默认穿搭与矢量/图片数据
         const categoriesData = {
             clothes: [
-                { id: 'c1', name: '薰衣草风衣', color: 0xb39ddb, img: null, selected: true },
-                { id: 'c2', name: '清冷露肩毛衣', color: 0xd1c4e9, img: null, selected: false },
-                { id: 'c3', name: '自定义上传', isUploadSlot: true }
+                { id: 'c1', name: '淡紫风衣', icon: '🧥', color: '#ab8beb', selected: true },
+                { id: 'c2', name: '清冷毛衣', icon: '👔', color: '#d1c4e9', selected: false },
+                { id: 'c3', name: '添加图片', isUploadSlot: true }
             ],
             acc: [
-                { id: 'a1', name: '珍珠法式发带', color: 0xffffff, img: null, selected: true },
-                { id: 'a2', name: '冷银复古墨镜', color: 0x90a4ae, img: null, selected: false },
-                { id: 'a3', name: '自定义上传', isUploadSlot: true }
+                { id: 'a1', name: '珍珠发带', icon: '👑', color: '#ffffff', selected: true },
+                { id: 'a2', name: '复古墨镜', icon: '🕶️', color: '#90a4ae', selected: false },
+                { id: 'a3', name: '添加图片', isUploadSlot: true }
             ],
             shoes: [
-                { id: 's1', name: '芭比粉马丁靴', color: 0xf48fb1, img: null, selected: true },
-                { id: 's2', name: '银色长筒靴', color: 0xcfd8dc, img: null, selected: false },
-                { id: 's3', name: '自定义上传', isUploadSlot: true }
+                { id: 's1', name: '芭比马丁靴', icon: '👢', color: '#f48fb1', selected: true },
+                { id: 's2', name: '银色长靴', icon: '👠', color: '#cfd8dc', selected: false },
+                { id: 's3', name: '添加图片', isUploadSlot: true }
             ],
             bags: [
-                { id: 'b1', name: '淡紫链条小包', color: 0x9575cd, img: null, selected: true },
-                { id: 'b2', name: '竹编可爱手提包', color: 0xd7ccc8, img: null, selected: false },
-                { id: 'b3', name: '自定义上传', isUploadSlot: true }
+                { id: 'b1', name: '淡紫链条包', icon: '👜', color: '#9575cd', selected: true },
+                { id: 'b2', name: '可爱竹编包', icon: '🛍️', color: '#d7ccc8', selected: false },
+                { id: 'b3', name: '添加图片', isUploadSlot: true }
             ]
         };
 
         let currentCategory = 'clothes';
-        let targetUploadFrameId = null;
+        let barbieState = { dressColor: '#ab8beb', bagColor: '#9575cd', angle: 0 };
 
-        // 渲染当前选中的分类框架
+        // 渲染左下穿搭框架
         function renderCategoryFrames() {
             const container = document.getElementById('gridContainer');
             container.innerHTML = '';
 
-            const list = categoriesData[currentCategory];
-            list.forEach(item => {
+            categoriesData[currentCategory].forEach(item => {
                 const frame = document.createElement('div');
                 frame.className = `item-frame ${item.selected ? 'selected' : ''}`;
-                
+
                 if (item.isUploadSlot) {
-                    frame.innerHTML = `
-                        <div class="upload-icon">➕</div>
-                        <div class="frame-label">加入图片</div>
-                    `;
-                    frame.onclick = () => triggerUpload(item.id);
+                    frame.innerHTML = `<div class="item-preview" style="font-size:20px;color:#9d8ec7;">➕</div><div class="frame-label">加入图片</div>`;
+                    frame.onclick = () => document.getElementById('imageUploader').click();
                 } else if (item.img) {
-                    frame.innerHTML = `
-                        <img src="${item.img}" alt="${item.name}">
-                        <div class="frame-label" style="position:absolute;bottom:2px;background:rgba(255,255,255,0.8);width:100%;">${item.name}</div>
-                    `;
+                    frame.innerHTML = `<div class="item-preview"><img src="${item.img}" /></div><div class="frame-label">${item.name}</div>`;
                     frame.onclick = () => selectFrame(item.id);
                 } else {
-                    // 默认预设色块卡片
-                    frame.innerHTML = `
-                        <div style="width:32px;height:32px;border-radius:50%;background:#${item.color.toString(16)};box-shadow:0 2px 6px rgba(0,0,0,0.15);margin-bottom:4px;"></div>
-                        <div class="frame-label">${item.name}</div>
-                    `;
+                    frame.innerHTML = `<div class="item-preview">${item.icon}</div><div class="frame-label">${item.name}</div>`;
                     frame.onclick = () => selectFrame(item.id);
                 }
-
                 container.appendChild(frame);
             });
         }
@@ -567,121 +443,156 @@
         }
 
         function selectFrame(id) {
-            categoriesData[currentCategory].forEach(item => {
-                item.selected = (item.id === id);
-            });
+            categoriesData[currentCategory].forEach(i => i.selected = (i.id === id));
             renderCategoryFrames();
-        }
-
-        function triggerUpload(frameId) {
-            targetUploadFrameId = frameId;
-            document.getElementById('imageUploader').click();
         }
 
         function handleImageUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(evt) {
                 const list = categoriesData[currentCategory];
-                // 新增或者更新上传项
-                const newId = 'custom_' + Date.now();
-                list.unshift({
-                    id: newId,
-                    name: '自定义图片',
-                    img: evt.target.result,
-                    color: 0xaa88ee,
-                    selected: true
-                });
-                // 取消其他选中
+                const newId = 'upload_' + Date.now();
+                list.unshift({ id: newId, name: '自定义', img: evt.target.result, color: '#ab8beb', selected: true });
                 list.forEach(i => { if (i.id !== newId) i.selected = false; });
                 renderCategoryFrames();
             };
             reader.readAsDataURL(file);
         }
 
-
-        /* ----------------------------------------------------
-         * 2. 左上方：动态成都熊猫基地 Canvas
-         * ---------------------------------------------------- */
+        // 1. 绘制左上：熊猫基地与动态大熊猫
         function initPandaCanvas() {
-            const canvas = document.getElementById('pandaCanvas');
-            const ctx = canvas.getContext('2d');
-
+            const cvs = document.getElementById('pandaCanvas');
+            const ctx = cvs.getContext('2d');
+            
             function resize() {
-                canvas.width = canvas.parentElement.clientWidth;
-                canvas.height = canvas.parentElement.clientHeight;
+                cvs.width = cvs.parentElement.clientWidth || 180;
+                cvs.height = cvs.parentElement.clientHeight || 180;
             }
             resize();
-            window.addEventListener('resize', resize);
 
             let time = 0;
-
             function draw() {
-                time += 0.03;
-                const w = canvas.width;
-                const h = canvas.height;
-
+                time += 0.04;
+                const w = cvs.width, h = cvs.height;
                 ctx.clearRect(0, 0, w, h);
 
-                // 绘制柔和绿色与紫色渐变的竹林背景
-                let bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-                bgGrad.addColorStop(0, '#e3f2fd');
-                bgGrad.addColorStop(0.5, '#e8f5e9');
-                bgGrad.addColorStop(1, '#f3e5f5');
-                ctx.fillStyle = bgGrad;
+                // 竹林背景
+                ctx.fillStyle = '#eaf4eb';
                 ctx.fillRect(0, 0, w, h);
 
-                // 绘制后台动态竹子
-                ctx.fillStyle = '#a5d6a7';
-                for (let i = 0; i < 5; i++) {
-                    let bx = (w * 0.18 * i) + Math.sin(time + i) * 2;
-                    ctx.fillRect(bx, 0, 8, h);
-                    // 竹节
-                    ctx.fillStyle = '#81c784';
-                    ctx.fillRect(bx - 1, h * 0.3, 10, 3);
-                    ctx.fillRect(bx - 1, h * 0.7, 10, 3);
-                    ctx.fillStyle = '#a5d6a7';
+                // 竹子
+                ctx.fillStyle = '#a8e6cf';
+                for(let i=0; i<4; i++){
+                    let bx = w * 0.25 * i + 15;
+                    ctx.fillRect(bx, 0, 6, h);
                 }
 
-                // 绘制动态大熊猫形象
-                const px = w * 0.5;
-                const py = h * 0.68;
-                const headBounce = Math.sin(time * 2) * 3;
+                // 熊猫位置
+                let px = w * 0.5, py = h * 0.65;
+                let bounce = Math.sin(time * 2) * 2;
 
                 // 身体
                 ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.ellipse(px, py + 15, 30, 25, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#333';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
+                ctx.beginPath(); ctx.arc(px, py + 10, 26, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = '#333'; ctx.stroke();
 
-                // 胳膊
-                ctx.fillStyle = '#2c2c2c';
-                ctx.beginPath();
-                ctx.ellipse(px - 22, py + 12, 10, 6, Math.PI / 4, 0, Math.PI * 2);
-                ctx.ellipse(px + 22, py + 12, 10, 6, -Math.PI / 4, 0, Math.PI * 2);
-                ctx.fill();
+                // 耳朵与手臂
+                ctx.fillStyle = '#333333';
+                ctx.beginPath(); ctx.arc(px - 18, py - 22 + bounce, 7, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(px + 18, py - 22 + bounce, 7, 0, Math.PI*2); ctx.fill();
 
-                // 脑袋
+                // 头部
                 ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(px, py - 10 + headBounce, 24, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
+                ctx.beginPath(); ctx.arc(px, py - 8 + bounce, 20, 0, Math.PI*2); ctx.fill(); ctx.stroke();
 
-                // 耳朵
-                ctx.fillStyle = '#2c2c2c';
+                // 眼睛与腮红
+                ctx.fillStyle = '#333';
+                ctx.beginPath(); ctx.arc(px - 7, py - 9 + bounce, 3, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(px + 7, py - 9 + bounce, 3, 0, Math.PI*2); ctx.fill();
+
+                ctx.fillStyle = '#ffb7b2';
+                ctx.beginPath(); ctx.arc(px - 12, py - 4 + bounce, 3.5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(px + 12, py - 4 + bounce, 3.5, 0, Math.PI*2); ctx.fill();
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // 2. 绘制右侧：真人卡通芭比形象 Canvas
+        function initBarbieCanvas() {
+            const cvs = document.getElementById('barbieCanvas');
+            const ctx = cvs.getContext('2d');
+
+            function resize() {
+                cvs.width = cvs.parentElement.clientWidth || 200;
+                cvs.height = cvs.parentElement.clientHeight || 280;
+            }
+            resize();
+
+            let t = 0;
+            function draw() {
+                t += 0.03;
+                const w = cvs.width, h = cvs.height;
+                ctx.clearRect(0, 0, w, h);
+
+                let cx = w * 0.5;
+                let cy = h * 0.5 + Math.sin(t) * 3; // 呼吸起伏
+
+                // 芭比长发 (金色)
+                ctx.fillStyle = '#ffe082';
+                ctx.beginPath(); ctx.arc(cx, cy - 40, 38, 0, Math.PI*2); ctx.fill();
+
+                // 身体与裙子
+                ctx.fillStyle = barbieState.dressColor;
                 ctx.beginPath();
-                ctx.arc(px - 20, py - 30 + headBounce, 8, 0, Math.PI * 2);
-                ctx.arc(px + 20, py - 30 + headBounce, 8, 0, Math.PI * 2);
+                ctx.moveTo(cx - 15, cy - 10);
+                ctx.lineTo(cx + 15, cy - 10);
+                ctx.lineTo(cx + 35, cy + 50);
+                ctx.lineTo(cx - 35, cy + 50);
+                ctx.closePath();
                 ctx.fill();
 
-                // 黑眼圈
-                ctx.beginPath();
-                ctx.ellipse(px - 10, py - 12 + headBounce, 7, 5, -Math.PI / 8, 0, Math.PI * 2);
-                ctx.ellipse(px + 10, py - 12 + headBounce, 7, 5, Math.PI / 8, 0, Math.PI * 2);
-                ctx.fill();
+                // 面部 (真人卡通轮廓)
+                ctx.fillStyle = '#ffedd8';
+                ctx.beginPath(); ctx.arc(cx, cy - 40, 24, 0, Math.PI*2); ctx.fill();
+
+                // 芭比大眼睛
+                ctx.fillStyle = '#3a86ff';
+                ctx.beginPath(); ctx.arc(cx - 8, cy - 42, 4, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(cx + 8, cy - 42, 4, 0, Math.PI*2); ctx.fill();
+
+                // 睫毛与唇彩
+                ctx.fillStyle = '#ff70a6';
+                ctx.beginPath(); ctx.arc(cx, cy - 32, 3, 0, Math.PI); ctx.fill();
+
+                // 手提包
+                ctx.fillStyle = barbieState.bagColor;
+                ctx.fillRect(cx + 22, cy + 10, 16, 14);
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // 生成更换穿搭
+        function applyOutfit() {
+            const selectedClothes = categoriesData.clothes.find(i => i.selected);
+            const selectedBag = categoriesData.bags.find(i => i.selected);
+
+            if (selectedClothes) barbieState.dressColor = selectedClothes.color || '#ab8beb';
+            if (selectedBag) barbieState.bagColor = selectedBag.color || '#9575cd';
+        }
+
+        window.onload = () => {
+            renderCategoryFrames();
+            setTimeout(() => {
+                initPandaCanvas();
+                initBarbieCanvas();
+            }, 100);
+        };
+    </script>
+</body>
+</html>
