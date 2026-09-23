@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>成都天气与芭比换装小程序</title>
+    <!-- Three.js 3D 渲染引擎库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-lavender: #f0e6ff;
+            --main-purple: #9d8ec7;
+            --dark-purple: #5c4e8c;
+            --light-purple: #f8f4ff;
+            --accent-pink: #f4c2c2;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --card-shadow: 0 8px 24px rgba(157, 142, 199, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8ddf5 0%, #f3ebfc 50%, #e5d8f6 100%);
+            color: var(--dark-purple);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 10px;
+        }
+
+        /* 手机适配容器 */
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            height: 92vh;
+            max-height: 880px;
+            background: rgba(248, 244, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 36px;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 16px 40px rgba(118, 93, 161, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 顶部标题栏 */
+        .header-bar {
+            padding: 12px 20px 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-purple);
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            background: linear-gradient(45deg, #6c529d, #a272c4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* 主工作区：左侧与右侧并排布局 */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1.05fr;
+            gap: 10px;
+            padding: 8px 12px 12px;
+            min-height: 0;
+        }
+
+        /* 模块卡片通用玻璃风格 */
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 左侧区域容器 */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        /* 左上：天气与熊猫基地画布 */
+        .weather-panda-card {
+            height: 48%;
+            position: relative;
+            background: linear-gradient(180deg, rgba(235, 222, 250, 0.8) 0%, rgba(255,255,255,0.7) 100%);
+        }
+
+        .weather-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 6px 10px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        .weather-city {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark-purple);
+        }
+
+        .weather-temp {
+            font-size: 18px;
+            font-weight: 800;
+            color: #6a4fa3;
+        }
+
+        .weather-desc {
+            font-size: 10px;
+            color: #7d6b9d;
+        }
+
+        #pandaCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 左下：可选择的穿搭框架 */
+        .outfit-selector-card {
+            height: 52%;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--dark-purple);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 分类 Tab */
+        .category-tabs {
+            display: flex;
+            gap: 2px;
+            background: rgba(220, 205, 240, 0.4);
+            padding: 3px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 10px;
+            padding: 4px 0;
+            border-radius: 7px;
+            color: #6b5c8d;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--dark-purple);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* 框架格子列表 */
+        .grid-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        /* 可选择/加入图片的框架卡片 */
+        .item-frame {
+            aspect-ratio: 1;
+            border: 2px dashed rgba(157, 142, 199, 0.4);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .item-frame.selected {
+            border: 2px solid #8e62d4;
+            background: rgba(240, 230, 255, 0.8);
+            box-shadow: 0 0 8px rgba(142, 98, 212, 0.4);
+        }
+
+        .item-frame img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+        }
+
+        .upload-icon {
+            font-size: 18px;
+            color: var(--main-purple);
+            margin-bottom: 2px;
+        }
+
+        .frame-label {
+            font-size: 9px;
+            color: #8372a6;
+            text-align: center;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* 右侧区域容器 */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        /* 右上：3D真人卡通芭比形象 */
+        .barbie-avatar-card {
+            height: 72%;
+            position: relative;
+            background: radial-gradient(circle at 50% 40%, rgba(255, 245, 255, 0.9) 0%, rgba(230, 215, 250, 0.6) 100%);
+        }
+
+        #barbie3dContainer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .style-tag {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            color: var(--dark-purple);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* 右下：3行可勾选任务清单 */
+        .task-list-card {
+            height: 28%;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .task-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 4px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+        }
+
+        .task-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid var(--main-purple);
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            background: #fff;
+        }
+
+        .task-checkbox:checked {
+            background-color: #8e62d4;
+            border-color: #8e62d4;
+        }
+
+        .task-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 10px;
+            top: -2px;
+            left: 2px;
+            font-weight: bold;
+        }
+
+        .task-text {
+            color: #554477;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 10px;
+        }
+
+        .task-checkbox:checked + .task-text {
+            text-decoration: line-through;
+            color: #a497c0;
+        }
+
+        /* 底部生成应用按钮 */
+        .action-bar {
+            padding: 8px 12px 12px;
+            text-align: center;
+        }
+
+        .apply-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ab8beb 0%, #8865d4 100%);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(136, 101, 212, 0.35);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .apply-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 3px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(157, 142, 199, 0.4);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 顶部 Header -->
+        <div class="header-bar">
+            <span style="font-size: 12px;">🌸 成都</span>
+            <span class="header-title">CHENGDU OUTFIT</span>
+            <span style="font-size: 12px;">✨ 芭比换装</span>
+        </div>
+
+        <!-- 主布局 (左边 / 右边) -->
+        <div class="main-content">
+            
+            <!-- 左边面板 -->
+            <div class="left-panel">
+                
+                <!-- 左边上面：成都实时天气 + 动态熊猫基地 -->
+                <div class="glass-card weather-panda-card">
+                    <div class="weather-info">
+                        <div>
+                            <div class="weather-city">成都 · 熊猫基地</div>
+                            <div class="weather-desc">适合清爽秋季穿搭</div>
+                        </div>
+                        <div class="weather-temp">22°C</div>
+                    </div>
+                    <canvas id="pandaCanvas"></canvas>
+                </div>
+
+                <!-- 左边下面：穿搭选择框架 (衣服, 配饰, 鞋, 包) -->
+                <div class="glass-card outfit-selector-card">
+                    <div class="section-title">
+                        <span>👔</span> 穿搭分类选择框
+                    </div>
+
+                    <!-- 4个分类页签 -->
+                    <div class="category-tabs">
+                        <button class="tab-btn active" onclick="switchCategory('clothes')">衣服</button>
+                        <button class="tab-btn" onclick="switchCategory('acc')">配饰</button>
+                        <button class="tab-btn" onclick="switchCategory('shoes')">鞋子</button>
+                        <button class="tab-btn" onclick="switchCategory('bags')">包包</button>
+                    </div>
+
+                    <!-- 图片框架显示区 -->
+                    <div class="grid-container" id="gridContainer">
+                        <!-- 动态生成框架内容 -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 右边面板 -->
+            <div class="right-panel">
+                
+                <!-- 右边上面：真人卡通化芭比 3D 人物形象 -->
+                <div class="glass-card barbie-avatar-card">
+                    <div id="barbie3dContainer"></div>
+                    <div class="style-tag">✨ 清冷可爱 · 3D 芭比形象</div>
+                </div>
+
+                <!-- 右边下面：3行可勾选任务清单 -->
+                <div class="glass-card task-list-card">
+                    <div class="section-title">
+                        <span>📝</span> 今日打卡清单
+                    </div>
+                    <div class="task-items">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" id="task1" checked>
+                            <input type="text" class="task-text" value="选一套清冷风紫色搭配">
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" id="task2">
+                            <input type="text" class="task-text" value="前往成都熊猫基地打卡">
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" id="task3">
+                            <input type="text" class="task-text" value="拍一张芭比风格卡通照">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 底部应用按钮 -->
+        <div class="action-bar">
+            <button class="apply-btn" onclick="applyOutfitToBarbie()">
+                <span>✨</span> 生成到右边芭比形象
+            </button>
+        </div>
+    </div>
+
+    <!-- 隐藏的通用文件上传控件 -->
+    <input type="file" id="imageUploader" class="file-input" accept="image/*" onchange="handleImageUpload(event)">
+
+    <script>
+        /* ----------------------------------------------------
+         * 1. 分类穿搭框架数据管理
+         * ---------------------------------------------------- */
+        const categoriesData = {
+            clothes: [
+                { id: 'c1', name: '薰衣草风衣', color: 0xb39ddb, img: null, selected: true },
+                { id: 'c2', name: '清冷露肩毛衣', color: 0xd1c4e9, img: null, selected: false },
+                { id: 'c3', name: '自定义上传', isUploadSlot: true }
+            ],
+            acc: [
+                { id: 'a1', name: '珍珠法式发带', color: 0xffffff, img: null, selected: true },
+                { id: 'a2', name: '冷银复古墨镜', color: 0x90a4ae, img: null, selected: false },
+                { id: 'a3', name: '自定义上传', isUploadSlot: true }
+            ],
+            shoes: [
+                { id: 's1', name: '芭比粉马丁靴', color: 0xf48fb1, img: null, selected: true },
+                { id: 's2', name: '银色长筒靴', color: 0xcfd8dc, img: null, selected: false },
+                { id: 's3', name: '自定义上传', isUploadSlot: true }
+            ],
+            bags: [
+                { id: 'b1', name: '淡紫链条小包', color: 0x9575cd, img: null, selected: true },
+                { id: 'b2', name: '竹编可爱手提包', color: 0xd7ccc8, img: null, selected: false },
+                { id: 'b3', name: '自定义上传', isUploadSlot: true }
+            ]
+        };
+
+        let currentCategory = 'clothes';
+        let targetUploadFrameId = null;
+
+        // 渲染当前选中的分类框架
+        function renderCategoryFrames() {
+            const container = document.getElementById('gridContainer');
+            container.innerHTML = '';
+
+            const list = categoriesData[currentCategory];
+            list.forEach(item => {
+                const frame = document.createElement('div');
+                frame.className = `item-frame ${item.selected ? 'selected' : ''}`;
+                
+                if (item.isUploadSlot) {
+                    frame.innerHTML = `
+                        <div class="upload-icon">➕</div>
+                        <div class="frame-label">加入图片</div>
+                    `;
+                    frame.onclick = () => triggerUpload(item.id);
+                } else if (item.img) {
+                    frame.innerHTML = `
+                        <img src="${item.img}" alt="${item.name}">
+                        <div class="frame-label" style="position:absolute;bottom:2px;background:rgba(255,255,255,0.8);width:100%;">${item.name}</div>
+                    `;
+                    frame.onclick = () => selectFrame(item.id);
+                } else {
+                    // 默认预设色块卡片
+                    frame.innerHTML = `
+                        <div style="width:32px;height:32px;border-radius:50%;background:#${item.color.toString(16)};box-shadow:0 2px 6px rgba(0,0,0,0.15);margin-bottom:4px;"></div>
+                        <div class="frame-label">${item.name}</div>
+                    `;
+                    frame.onclick = () => selectFrame(item.id);
+                }
+
+                container.appendChild(frame);
+            });
+        }
+
+        function switchCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', ['clothes', 'acc', 'shoes', 'bags'][idx] === cat);
+            });
+            renderCategoryFrames();
+        }
+
+        function selectFrame(id) {
+            categoriesData[currentCategory].forEach(item => {
+                item.selected = (item.id === id);
+            });
+            renderCategoryFrames();
+        }
+
+        function triggerUpload(frameId) {
+            targetUploadFrameId = frameId;
+            document.getElementById('imageUploader').click();
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const list = categoriesData[currentCategory];
+                // 新增或者更新上传项
+                const newId = 'custom_' + Date.now();
+                list.unshift({
+                    id: newId,
+                    name: '自定义图片',
+                    img: evt.target.result,
+                    color: 0xaa88ee,
+                    selected: true
+                });
+                // 取消其他选中
+                list.forEach(i => { if (i.id !== newId) i.selected = false; });
+                renderCategoryFrames();
+            };
+            reader.readAsDataURL(file);
+        }
+
+
+        /* ----------------------------------------------------
+         * 2. 左上方：动态成都熊猫基地 Canvas
+         * ---------------------------------------------------- */
+        function initPandaCanvas() {
+            const canvas = document.getElementById('pandaCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            let time = 0;
+
+            function draw() {
+                time += 0.03;
+                const w = canvas.width;
+                const h = canvas.height;
+
+                ctx.clearRect(0, 0, w, h);
+
+                // 绘制柔和绿色与紫色渐变的竹林背景
+                let bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+                bgGrad.addColorStop(0, '#e3f2fd');
+                bgGrad.addColorStop(0.5, '#e8f5e9');
+                bgGrad.addColorStop(1, '#f3e5f5');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, w, h);
+
+                // 绘制后台动态竹子
+                ctx.fillStyle = '#a5d6a7';
+                for (let i = 0; i < 5; i++) {
+                    let bx = (w * 0.18 * i) + Math.sin(time + i) * 2;
+                    ctx.fillRect(bx, 0, 8, h);
+                    // 竹节
+                    ctx.fillStyle = '#81c784';
+                    ctx.fillRect(bx - 1, h * 0.3, 10, 3);
+                    ctx.fillRect(bx - 1, h * 0.7, 10, 3);
+                    ctx.fillStyle = '#a5d6a7';
+                }
+
+                // 绘制动态大熊猫形象
+                const px = w * 0.5;
+                const py = h * 0.68;
+                const headBounce = Math.sin(time * 2) * 3;
+
+                // 身体
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.ellipse(px, py + 15, 30, 25, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // 胳膊
+                ctx.fillStyle = '#2c2c2c';
+                ctx.beginPath();
+                ctx.ellipse(px - 22, py + 12, 10, 6, Math.PI / 4, 0, Math.PI * 2);
+                ctx.ellipse(px + 22, py + 12, 10, 6, -Math.PI / 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 脑袋
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(px, py - 10 + headBounce, 24, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // 耳朵
+                ctx.fillStyle = '#2c2c2c';
+                ctx.beginPath();
+                ctx.arc(px - 20, py - 30 + headBounce, 8, 0, Math.PI * 2);
+                ctx.arc(px + 20, py - 30 + headBounce, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 黑眼圈
+                ctx.beginPath();
+                ctx.ellipse(px - 10, py - 12 + headBounce, 7, 5, -Math.PI / 8, 0, Math.PI * 2);
+                ctx.ellipse(px + 10, py - 12 + headBounce, 7, 5, Math.PI / 8, 0, Math.PI * 2);
+                ctx.fill();
